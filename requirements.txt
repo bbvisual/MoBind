@@ -1,0 +1,11 @@
+torch>=2.0.0
+torchvision
+numpy
+scipy
+pandas
+omegaconf
+wandb
+tqdm
+matplotlib
+seaborn
+opencv-python

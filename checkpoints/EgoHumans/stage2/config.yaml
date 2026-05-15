@@ -1,0 +1,67 @@
+experiment:
+  name: mae
+  seed: 1201
+  output_dir: ./outputs/${experiment.name}
+  precision: amp
+  device: cuda
+wandb:
+  enabled: true
+  project: MoBind
+  config:
+    experiment: ${experiment}
+    data: ${data}
+    model: ${model}
+    optimizer: ${optimizer}
+    training: ${training}
+    distributed: ${distributed}
+# Set DATA_ROOT in configs/config.py; root_dir should be DATA_ROOT/EgoHumans
+data:
+  root_dir: /path/to/datasets/EgoHumans
+  window_sec: 5
+  stride_sec: 2
+  split: action
+  imu_srate: 20
+  motion_srate: 20
+  motion_type: wjoint
+  multi_sensor: true
+  num_limbs: 5
+  dataset_name: EgoHumans
+  drop_sensors: false
+  loader:
+    batch_size: 128
+    num_workers: 8
+    pin_memory: true
+# Set stage1_exp to where you placed the Stage 1 checkpoint (e.g. ./checkpoints/EgoHumans/stage1)
+model:
+  stage1_exp: ./checkpoints/EgoHumans/stage1
+  imu_encoder: conv_former
+  imu_channels: 7
+  motion_encoder: conv_former
+  motion_channels: 6
+  num_blocks: 4
+  num_heads: 8
+  patch_sec: 0.2
+  embedding_size: 256
+  global_embedding_size: 256
+  agg: null
+  lambda_mae: 0.3
+  mask_ratio: 0.75
+optimizer:
+  opt: adam
+  lr: 0.0001
+  weight_decay: 0.0001
+training:
+  epochs: 10000
+  log_interval: 25
+  val_interval: 1
+  local_weight: 0.0
+  multi_weight: 0.2
+  global_weight: 1.0
+  early_stopping:
+    patience: 500
+    min_delta: 0.001
+    mode: max
+distributed:
+  backend: nccl
+  gpus:
+  - 0
